@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - deployment.yaml
+  - service.yaml
+
+# Le générateur ajoute un suffixe de hachage au nom de la ConfigMap et met à jour
+# les références (envFrom) : toute modification du contenu déclenche un rollout.
+configMapGenerator:
+  - name: web-config
+    literals:
+      - MESSAGE=Bonjour depuis la base
+      - LOG_LEVEL=info
