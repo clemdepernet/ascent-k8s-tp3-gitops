@@ -1,0 +1,36 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: tp3-prod
+
+resources:
+  - ../../base
+  - namespace.yaml
+
+labels:
+  - pairs:
+      env: prod
+    includeSelectors: true
+
+# Patch "strategic merge" inline : seul le champ replicas est modifie
+patches:
+  - target:
+      kind: Deployment
+      name: web
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: web
+      spec:
+        replicas: 3
+
+images:
+  - name: nginx
+    newTag: 1.28-alpine
+
+configMapGenerator:
+  - name: web-config
+    behavior: merge
+    literals:
+      - MESSAGE=Environnement de production
