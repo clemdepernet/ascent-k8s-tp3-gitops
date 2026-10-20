@@ -1,0 +1,23 @@
+# Application Argo CD : déploie l'overlay prod (branche solution) de CE dépôt et le maintient synchronisé.
+# Prérequis : Argo CD installé dans le namespace argocd (TP3, partie D2).
+#   kubectl --context lab apply -f argocd/application-prod.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: web-prod
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/clemdepernet/ascent-k8s-tp3-gitops.git
+    targetRevision: solution
+    path: overlays/prod
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: tp3-prod
+  syncPolicy:
+    automated:
+      prune: true      # supprime du cluster ce qui disparaît du dépôt
+      selfHeal: true   # annule toute modification faite à la main sur le cluster
+    syncOptions:
+      - CreateNamespace=true
